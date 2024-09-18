@@ -1,4 +1,4 @@
-# Phishing-Detection# csce585-project
+# Phishing-Detection
 ### Project Proposal
 ##### Comments from Presentation
 1. Can the web app for the model take over to actively prevent users from clicking links labeled as phishing?
