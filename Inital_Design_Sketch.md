@@ -6,7 +6,7 @@
 - Real-time detection
 
 ## Initial Experiment
-un a phishing email data set through a baseline model or non-llm approach and see the accuracy of the results. We can compare the performance of a state-of-the-art phishing detection model to that of a baseline to show the importance of modern models for phishing detection. 
+Run a phishing email data set through a baseline model or non-llm approach and see the accuracy of the results. We can compare the performance of a state-of-the-art phishing detection model to that of a baseline to show the importance of modern models for phishing detection. 
 Metrics we need to show are F1 score, meeting our accuracy thresholds, and improved accuracy over baseline models and non-LLM methods.  
 
 ## Goals
