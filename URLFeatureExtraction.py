@@ -6,6 +6,8 @@
 from urllib.parse import urlparse,urlencode
 import ipaddress
 import re
+import pandas as pd
+import whois
 
 """#### **3.1.1. Domain of the URL**
 Here, we are just extracting the domain present in the URL. This feature doesn't have much significance in the training. May even be dropped while training the model.
@@ -348,11 +350,12 @@ Create a list and a function that calls the other functions and stores all the f
 """
 
 #Function to extract features
-def featureExtraction(url):
+def featureExtraction(url,label):
 
   features = []
   #Address bar based features (10)
   #features.append(getDomain(url))
+  features.append(url)
   features.append(havingIP(url))
   features.append(haveAtSign(url))
   features.append(getLength(url))
@@ -370,7 +373,6 @@ def featureExtraction(url):
     dns = 1
 
   features.append(dns)
-  features.append(web_traffic(url))
   features.append(1 if dns == 1 else domainAge(domain_name))
   features.append(1 if dns == 1 else domainEnd(domain_name))
   
@@ -384,11 +386,40 @@ def featureExtraction(url):
   features.append(mouseOver(response))
   features.append(rightClick(response))
   features.append(forwarding(response))
+  features.append(label)
   
   return features
 
 #converting the list to dataframe
-feature_names = ['Domain', 'Have_IP', 'Have_At', 'URL_Length', 'URL_Depth','Redirection', 
-                      'https_Domain', 'TinyURL', 'Prefix/Suffix', 'DNS_Record', 'Web_Traffic', 
+feature_names = ['URL','Have_IP', 'Have_At', 'URL_Length', 'URL_Depth','Redirection', 
+                      'https_Domain', 'TinyURL', 'Prefix/Suffix', 'DNS_Record',
                       'Domain_Age', 'Domain_End', 'iFrame', 'Mouse_Over','Right_Click', 'Web_Forwards', 'Label']
+
+
+# Load the dataset
+df = pd.read_csv('urldata.csv')
+# split into legit and phishing to insure correct labeling 
+# 0 for legit, 1 for phishing
+legit_links = df[df['result'] == 0].reset_index(drop=True)
+# get feature for
+legit_features = []
+for i in range(legit_links.shape[0]):
+  url = legit_links['url'][i]
+  legit_features.append(featureExtraction(url,0))
+# create features for legit URLs
+legit = pd.DataFrame(legit_features, columns= feature_names)
+# phishing links
+phish_links = df[df['result'] == 1].reset_index(drop=True)
+# get features for phishing links
+phish_features = []
+for i in range(phish_links.shape[0]):
+  url = phish_links['url'][i]
+  phish_features.append(featureExtraction(url,1))
+phish = pd.DataFrame(phish_features, columns= feature_names)
+# concatonate data sets
+feature_data = pd.concat([legit, phish]).reset_index(drop=True)
+print(feature_data)
+
+
+
 
