@@ -8,9 +8,11 @@ import ipaddress
 import re
 import pandas as pd
 import whois
-# threading for feature extraction
+# threading for feature extraction - added by us
 import concurrent.futures
 import time
+# command line inputs
+import argparse
 
 
 """#### **3.1.1. Domain of the URL**
@@ -394,48 +396,53 @@ def featureExtraction(url,label):
   
   return features
 
+# added by Tyler Beasley, Keshawn Blakely and Matthew Tieman for CSCE585
 # extract and add features to csv file as we go
 def features_to_csv(url, filename, label):
   feature = featureExtraction(url,label)
-  df = pd.DataFrame([feature], columns=[feature_names])
+  df = pd.DataFrame([feature], columns=['URL','Have_IP', 'Have_At', 'URL_Length', 'URL_Depth','Redirection', 
+                        'https_Domain', 'TinyURL', 'Prefix/Suffix', 'DNS_Record',
+                        'Domain_Age', 'Domain_End', 'iFrame', 'Mouse_Over','Right_Click', 'Web_Forwards', 'Label'])
   # Append to the CSV file without writing the header again
   df.to_csv(filename, mode='a', header=False, index=False)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Feature Extraction od data set of URLs for phishing detection.")
+    parser.add_argument("file", help="Path to the CSV file containing URLs.")
+    return parser.parse_args()
+def main():
 
-#converting the list to dataframe
-feature_names = ['URL','Have_IP', 'Have_At', 'URL_Length', 'URL_Depth','Redirection', 
-                      'https_Domain', 'TinyURL', 'Prefix/Suffix', 'DNS_Record',
-                      'Domain_Age', 'Domain_End', 'iFrame', 'Mouse_Over','Right_Click', 'Web_Forwards', 'Label']
+  args = parse_args()
+  file = args.file
 
+  # Load the dataset
+  df = pd.read_csv(file)
+  # split into legit and phishing to insure correct labeling 
+  # 0 for legit, 1 for phishing
+  legit_links = df[df['result'] == 0].reset_index(drop=True)
+  # phishing links
+  phish_links = df[df['result'] == 1].reset_index(drop=True)
+  TIMEOUT = 120
+  with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+      future_to_url = {executor.submit(features_to_csv, row.url, 'featuredata.csv', 0): row.url for row in legit_links.itertuples(index=False)}
+      for future in concurrent.futures.as_completed(future_to_url, timeout=TIMEOUT):
+          try:
+              future.result(timeout=TIMEOUT)
+          except concurrent.futures.TimeoutError:
+              print(f"URL took too long, skipping: {future_to_url[future]}")
+          except Exception as e:
+              print(f"Error occurred for URL {future_to_url[future]}: {e}")
 
-# Load the dataset
-df = pd.read_csv('urldata.csv')
-# split into legit and phishing to insure correct labeling 
-# 0 for legit, 1 for phishing
-legit_links = df[df['result'] == 0].reset_index(drop=True)
-# phishing links
-phish_links = df[df['result'] == 1].reset_index(drop=True)
-TIMEOUT = 120
-with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-    future_to_url = {executor.submit(features_to_csv, row.url, 'featuredata.csv', 0): row.url for row in legit_links.itertuples(index=False)}
-    for future in concurrent.futures.as_completed(future_to_url, timeout=TIMEOUT):
-        try:
-            future.result(timeout=TIMEOUT)
-        except concurrent.futures.TimeoutError:
-            print(f"URL took too long, skipping: {future_to_url[future]}")
-        except Exception as e:
-            print(f"Error occurred for URL {future_to_url[future]}: {e}")
-
-# Repeat the same for phishing links
-with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-    future_to_url = {executor.submit(features_to_csv, row.url, 'featuredata.csv', 1): row.url for row in phish_links.itertuples(index=False)}
-    for future in concurrent.futures.as_completed(future_to_url, timeout=TIMEOUT):
-        try:
-            future.result(timeout=TIMEOUT)
-        except concurrent.futures.TimeoutError:
-            print(f"URL took too long, skipping: {future_to_url[future]}")
-        except Exception as e:
-            print(f"Error occurred for URL {future_to_url[future]}: {e}")
+  # Repeat the same for phishing links
+  with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+      future_to_url = {executor.submit(features_to_csv, row.url, 'featuredata.csv', 1): row.url for row in phish_links.itertuples(index=False)}
+      for future in concurrent.futures.as_completed(future_to_url, timeout=TIMEOUT):
+          try:
+              future.result(timeout=TIMEOUT)
+          except concurrent.futures.TimeoutError:
+              print(f"URL took too long, skipping: {future_to_url[future]}")
+          except Exception as e:
+              print(f"Error occurred for URL {future_to_url[future]}: {e}")
 
 
 
