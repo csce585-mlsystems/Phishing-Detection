@@ -1,5 +1,6 @@
-# Taken from https://github.com/shreyagopal/Phishing-Website-Detection-by-Machine-Learning-Techniques/blob/master/URLFeatureExtraction.py
-
+# Feature extraction methods taken from https://github.com/shreyagopal/Phishing-Website-Detection-by-Machine-Learning-Techniques/blob/master/URLFeatureExtraction.py
+# some commented out and addiitional methods for feature extraction of our specific data set
+# done by Tyler Beasley, Keshawn Blakely, and Matthew Tieman for CSCE585
 # -*- coding: utf-8 -*-
 
 # importing required packages for this section
