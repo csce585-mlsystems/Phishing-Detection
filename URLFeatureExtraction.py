@@ -7,7 +7,7 @@ from urllib.parse import urlparse,urlencode
 import ipaddress
 import re
 import pandas as pd
-import whois
+#import whois
 # threading for feature extraction - added by us
 import concurrent.futures
 import time
