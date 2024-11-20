@@ -18,10 +18,10 @@ def load_resources():
     
     try:
         # Load the trained model
-        model = load_model('C:/Users/tyler/Phishing-Detection/phishing_gru_model.keras')
+        model = load_model('/home/tbeasley/Phishing-Detection/phishing_gru_model.keras')
         
         # Load the tokenizer
-        with open('C:/Users/tyler/Phishing-Detection/tokenizer.pkl', 'rb') as f:
+        with open('/home/tbeasley/Phishing-Detection/tokenizer.pkl', 'rb') as f:
             tokenizer = pickle.load(f)
             
         return True
