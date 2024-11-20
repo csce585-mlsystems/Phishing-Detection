@@ -1,64 +1,110 @@
 import React, { useState } from 'react';
 
-const UrlAnalyzer = () => {
-    // State to hold the URL and the prediction result
-    const [url, setUrl] = useState('');
-    const [prediction, setPrediction] = useState(null);  // To store prediction result
-    const [loading, setLoading] = useState(false);  // To handle loading state
+const PhishingDetector = () => {
+  const [url, setUrl] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    // Function to handle URL analysis
-    const analyzeUrl = async () => {
-        if (!url) {
-            alert("Please enter a URL to analyze.");
-            return;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
-        setLoading(true);  // Start loading
-        try {
-            const response = await fetch('http://localhost:5000/analyze', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ url }),
-            });
+    if (!url) {
+      setError('Please enter a URL');
+      setLoading(false);
+      return;
+    }
 
-            const result = await response.json();
-            setPrediction(result.prediction);  // Update state with prediction result
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while analyzing the URL.');
-        }
-        setLoading(false);  // Stop loading
-    };
+    try {
+      const response = await fetch('http://localhost:5000/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
 
-    return (
-        <div>
-            <h2>URL Phishing Analyzer</h2>
+      if (!response.ok) {
+        throw new Error('Failed to analyze URL');
+      }
 
-            {/* Input field for URL */}
-            <input
-                type="text"
-                placeholder="Enter URL"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                style={{ padding: '8px', marginBottom: '10px', width: '300px' }}
-            />
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            {/* Analyze button */}
-            <button onClick={analyzeUrl} disabled={loading} style={{ padding: '8px 16px' }}>
-                {loading ? 'Analyzing...' : 'Analyze'}
-            </button>
+  return (
+    <div style={{ maxWidth: '600px', margin: '20px auto', padding: '20px' }}>
+      <h1>URL Phishing Detector</h1>
+      <p>Enter a URL to analyze if it's potentially a phishing site</p>
 
-            {/* Display the prediction result */}
-            {prediction !== null && (
-                <div style={{ marginTop: '20px' }}>
-                    <h3>Prediction Result:</h3>
-                    <p>{prediction === 1 ? 'Phishing URL' : 'Safe URL'}</p>
-                </div>
-            )}
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '20px' }}>
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Enter URL (e.g., https://example.com)"
+            style={{ 
+              width: '70%',
+              padding: '8px',
+              marginRight: '10px'
+            }}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ 
+              padding: '8px 16px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {loading ? 'Analyzing...' : 'Analyze'}
+          </button>
         </div>
-    );
+
+        {error && (
+          <div style={{ 
+            padding: '10px', 
+            backgroundColor: '#ffebee', 
+            color: '#c62828',
+            marginBottom: '10px',
+            borderRadius: '4px'
+          }}>
+            {error}
+          </div>
+        )}
+
+        {result && (
+          <div style={{ 
+            padding: '20px', 
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px'
+          }}>
+            <h3>Analysis Results:</h3>
+            <p>Classification: <strong style={{ 
+              color: result.classification === 'phishing' ? '#c62828' : '#2e7d32'
+            }}>
+              {result.classification}
+            </strong></p>
+            <p>Confidence: {(result.confidence * 100).toFixed(1)}%</p>
+            <p>Raw Score: {result.prediction.toFixed(4)}</p>
+          </div>
+        )}
+      </form>
+    </div>
+  );
 };
 
-export default UrlAnalyzer;
+export default PhishingDetector;
