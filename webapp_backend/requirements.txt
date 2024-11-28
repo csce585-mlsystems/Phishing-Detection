@@ -1,0 +1,6 @@
+Flask
+flask-cors
+numpy
+tensorflow==2.18.0
+pandas
+pickle5

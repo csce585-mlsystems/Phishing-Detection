@@ -6,6 +6,9 @@ const PhishingDetector = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -19,7 +22,7 @@ const PhishingDetector = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/predict', {
+      const response = await fetch(`${backendUrl}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
