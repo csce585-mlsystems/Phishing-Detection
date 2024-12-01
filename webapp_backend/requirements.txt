@@ -1,6 +1,6 @@
 Flask
 flask-cors
 numpy
-tensorflow==2.18.0
+tensorflow==2.13.1
 pandas
 pickle5
