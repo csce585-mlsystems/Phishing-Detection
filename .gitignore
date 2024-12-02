@@ -1,2 +1,3 @@
 *.csv
-*.json
+
+webapp_backend/credentials.json
