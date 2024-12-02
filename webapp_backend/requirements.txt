@@ -1,6 +1,5 @@
-Flask
+flask
 flask-cors
 numpy
-tensorflow==2.13.1
+tensorflow
 pandas
-pickle5
