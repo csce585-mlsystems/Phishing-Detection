@@ -15,9 +15,9 @@ CORS(app)
 model = None
 tokenizer = None
 
-# Paths to model and tokenizer
-MODEL_PATH = os.path.join(os.getcwd(), "model", "phishing_BiLstm_model.keras")
-TOKENIZER_PATH = os.path.join(os.getcwd(), "model", "BiLstm_tokenizer.pkl")
+# Paths to model and tokenizer ADJUST MODEL HERE
+MODEL_PATH = os.path.join(os.getcwd(), "model", "phishing_gru_model.keras")
+TOKENIZER_PATH = os.path.join(os.getcwd(), "model", "gru_tokenizer.pkl")
 
 def load_resources():
     """Load the model and tokenizer when the app starts."""
