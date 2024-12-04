@@ -2,18 +2,18 @@
 
 ### How to replicate results
 
-#### train models
+#### Train models
 First, clone this repository onto your local machine
 Start by installing all necessary packages in the requirements.txt file, as well as react and node.js for the web app.
 Next, each model can be trained and tested for accuracy by running their respective Jupyter notebooks.
-#### run webapp
+#### Tun Webapp
 The react web app can be run by navigating to the app directory and running 'npm start' in the terminal.
 Then, open another terminal window, navigate to the webapp_backend directory, and edit webapp_ModelAPI to whichever model you desire for the webapp. It will be the GRU model by default.
 Start the backend server by running webapp_modelAPI in Python. 
 Navigate to localhost:3000 to check single URLs with the model to see if they are phishing or benign.
 From here, the user can input a single link to check its safety and see their link history.
 The user can also connect their Gmail account, where they will be navigated to log in and authenticate with Gmail, once this is completed, they can navigate back to the react app to see recent links in emails and their classifications!
-#### Load bearing testing
+#### Load Bearing Testing
 Load bearing testing can be done using locust by simply starting the backend server as shown above, then opening a new terminal and running 'locust -f locustfile.py --host=http://localhost:5000'
 From here, navigate to the locust dashboard at localhost:8089, and then run locust testing as desired
 
